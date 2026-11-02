@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>费佳玲生日快乐🎂</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body {
+    height:100%;
+    overflow:hidden;
+    background:linear-gradient(135deg,#0f1020,#1a1a3e,#2d1b69,#1a1a3e,#0f1020);
+    background-size:400% 400%;
+    animation:bgShift 12s ease infinite;
+    font-family:"PingFang SC","Microsoft YaHei",sans-serif;
+  }
+  @keyframes bgShift {
+    0%,100%{ background-position:0% 50%; }
+    50%{ background-position:100% 50%; }
+  }
+  #stage { position:relative; width:100vw; height:100vh; z-index:2; }
+  #fx { position:fixed; inset:0; z-index:1; pointer-events:none; }
+
+  .card {
+    position:absolute;
+    padding:12px 16px;
+    border-radius:16px;
+    color:#fff;
+    font-size:14px;
+    font-weight:700;
+    line-height:1.3;
+    min-width:110px;
+    max-width:150px;
+    text-align:center;
+    box-shadow:0 6px 20px rgba(0,0,0,.3);
+    opacity:0;
+    transform:scale(.5) rotate(-4deg);
+    animation:pop .5s cubic-bezier(.34,1.56,.64,1) forwards;
+    user-select:none;
+  }
+  @keyframes pop {
+    to { opacity:1; transform:scale(1) rotate(var(--r)); }
+  }
+
+  .cake {
+    position:fixed;
+    top:-60px;
+    font-size:26px;
+    z-index:3;
+    pointer-events:none;
+    animation:fall linear forwards;
+  }
+  @keyframes fall {
+    to { transform:translateY(110vh) rotate(360deg); opacity:.9; }
+  }
+
+  #finale {
+    position:fixed;
+    left:50%; top:50%;
+    transform:translate(-50%,-50%) scale(.9);
+    padding:22px 32px;
+    background:rgba(255,255,255,.15);
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+    border:1px solid rgba(255,255,255,.25);
+    border-radius:20px;
+    color:#fff;
+    font-size:22px;
+    font-weight:600;
+    text-align:center;
+    box-shadow:0 8px 32px rgba(0,0,0,.2);
+    z-index:5;
+    opacity:0;
+    animation:fadeIn 1.2s 3.4s ease forwards;
+    pointer-events:none;
+  }
+  @keyframes fadeIn {
+    to { opacity:1; transform:translate(-50%,-50%) scale(1); }
+  }
+
+  #tip {
+    position:fixed;
+    left:50%; bottom:24px;
+    transform:translateX(-50%);
+    color:#fff7;
+    font-size:13px;
+    z-index:6;
+    pointer-events:none;
+  }
+</style>
+</head>
+<body>
+<canvas id="fx"></canvas>
+<div id="stage"></div>
+<div id="finale">费佳玲生日快乐 🎂</div>
+<div id="tip">点屏幕再放一波🎉</div>
+
+<script>
+/* ---------- 祝福卡片 ---------- */
+const wishes = [
+  "生日快乐🎂","Happy Birthday🎉","又年轻一岁","生日大快乐",
+  "愿你岁岁平安","年年有今日","岁岁有今朝","好事发生",
+  "所念皆如愿","万事皆可期","愿所求皆所愿","生辰吉乐",
+  "快乐不打烊","今天你最大","全世界宠你","新的一岁更闪耀",
+  "好运排队找你","未来皆可期","许的愿都实现","祝你天天开心",
+  "愿你眼里有光","前路繁花似锦","归来仍是少年","祝你发财被爱",
+  "平安喜乐","万事顺遂","心想事成","甜甜蜜蜜过一生"
+];
+const colors = [
+  "linear-gradient(135deg,#ff6b81,#ee5a24)",
+  "linear-gradient(135deg,#feca57,#ff9f43)",
+  "linear-gradient(135deg,#48dbfb,#0abde3)",
+  "linear-gradient(135deg,#ff9ff3,#f368e0)",
+  "linear-gradient(135deg,#54a0ff,#2e86de)",
+  "linear-gradient(135deg,#5f27cd,#341f97)",
+  "linear-gradient(135deg,#10ac84,#1dd1a1)",
+  "linear-gradient(135deg,#fd79a8,#e84393)",
+  "linear-gradient(135deg,#a29bfe,#6c5ce7)",
+  "linear-gradient(135deg,#55efc4,#00b894)"
+];
+const stage = document.getElementById("stage");
+const rand = (a,b)=>Math.random()*(b-a)+a;
+
+function spawnCard(){
+  const c = document.createElement("div");
+  c.className = "card";
+  c.textContent = wishes[Math.floor(Math.random()*wishes.length)];
+  c.style.background = colors[Math.floor(Math.random()*colors.length)];
+  c.style.left = rand(0,85)+"vw";
+  c.style.top = rand(0,85)+"vh";
+  c.style.setProperty("--r", rand(-7,7)+"deg");
+  stage.appendChild(c);
+  if(stage.children.length>130) stage.removeChild(stage.firstChild);
+}
+function burst(n=18){ for(let i=0;i<n;i++) setTimeout(spawnCard,i*70); }
+
+// 开场密集铺满
+let waves=0;
+const t=setInterval(()=>{
+  burst(18); if(++waves>6) clearInterval(t);
+},280);
+
+// 之后持续补充，不留白
+setInterval(()=>burst(6), 600);
+
+document.body.addEventListener("click",()=>{ burst(16); launchFirework(); });
+
+/* ---------- 蛋糕雨 ---------- */
+function cakeRain(count=18){
+  const emojis=["🎂","🧁","🍰","🎈","✨"];
+  for(let i=0;i<count;i++){
+    const s=document.createElement("div");
+    s.className="cake";
+    s.textContent=emojis[Math.floor(Math.random()*emojis.length)];
+    s.style.left=rand(2,96)+"vw";
+    s.style.fontSize=rand(22,36)+"px";
+    s.style.animationDuration=rand(3.5,6)+"s";
+    s.style.animationDelay=rand(0,2.5)+"s";
+    document.body.appendChild(s);
+    setTimeout(()=>s.remove(), 9000);
+  }
+}
+setTimeout(()=>cakeRain(20), 800);
+setInterval(()=>cakeRain(6), 2500);
+
+/* ---------- 烟花 canvas ---------- */
+const cvs=document.getElementById("fx");
+const ctx=cvs.getContext("2d");
+function resize(){ cvs.width=innerWidth; cvs.height=innerHeight; }
+resize(); addEventListener("resize",resize);
+
+let parts=[];
+function launchFirework(x,y){
+  const hue=Math.floor(Math.random()*360);
+  const n=36+Math.floor(Math.random()*20);
+  for(let i=0;i<n;i++){
+    const ang=(Math.PI*2*i)/n;
+    const sp=rand(1.5,4.5);
+    parts.push({
+      x,y,
+      vx:Math.cos(ang)*sp,
+      vy:Math.sin(ang)*sp,
+      life:1,
+      hue:hue+rand(-20,20),
+      r:rand(1.5,3)
+    });
+  }
+}
+function tick(){
+  ctx.clearRect(0,0,cvs.width,cvs.height);
+  ctx.globalCompositeOperation="lighter";
+  for(let i=parts.length-1;i>=0;i--){
+    const p=parts[i];
+    p.x+=p.vx; p.y+=p.vy;
+    p.vy+=0.04; p.vx*=0.98; p.vy*=0.98;
+    p.life-=0.012;
+    if(p.life<=0){ parts.splice(i,1); continue; }
+    ctx.beginPath();
+    ctx.fillStyle=`hsla(${p.hue},100%,65%,${p.life})`;
+    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fill();
+  }
+  requestAnimationFrame(tick);
+}
+tick();
+
+function autoFx(){
+  launchFirework(rand(innerWidth*0.2,innerWidth*0.8), rand(innerHeight*0.2,innerHeight*0.5));
+  setTimeout(()=>launchFirework(rand(innerWidth*0.2,innerWidth*0.8), rand(innerHeight*0.2,innerHeight*0.5)), 700);
+}
+setTimeout(autoFx, 1200);
+setInterval(()=>{ if(Math.random()>0.3) autoFx(); }, 1800);
+</script>
+</body>
+</html>
